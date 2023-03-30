@@ -1,0 +1,6 @@
+/server/database/storage
+/server/config.json
+/server/venv
+/server/*.session
+/server/*.session-journal
+
