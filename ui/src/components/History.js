@@ -1,4 +1,29 @@
+import React, {useState, useEffect} from 'react';
+import axios from "axios";
+import AnimatedNumber from "animated-number-react2";
+
 function History() {
+
+    const [closedTrades, setClosedTrades] = useState([]);
+    useEffect(() => {
+        fetchActiveTrades();
+        const interval = setInterval(() => fetchActiveTrades(), 3000)
+        return () => {
+            clearInterval(interval);
+        }
+    }, []);
+    const formatValue = (value) => value.toFixed(2);
+    const fetchActiveTrades = () => {
+        axios
+            .get('http://localhost:5000/closed-trades')
+            .then((res) => {
+                setClosedTrades(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     return (
         <div className="container border rounded mt-4">
             <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -37,30 +62,14 @@ function History() {
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
+                {closedTrades.map((trade) => (
+                    <tr className="w-25">
+                        <th scope="row">{trade['ticket']}</th>
+                        <td>{trade['instrument']}</td>
+                        <td>{trade['profit']}</td>
+                        <td>{trade['comment'] ? trade['comment'] : 'Not from Signal Channel'}</td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
             <nav aria-label="Page navigation example">
