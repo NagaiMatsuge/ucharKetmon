@@ -42,11 +42,17 @@ def createTrade():
 
 @app.route('/update-chats', methods=['PATCH'])
 def updateChatInfo():
-    telegramService.updateChatInfo(db, json.loads(request.data))
-    return {
-        'success': True,
-        'error-message': None
-    }
+    try:
+        telegramService.updateChatInfo(db, json.loads(request.data))
+        return {
+            'success': True,
+            'error-message': None
+        }
+    except Exception as e:
+        return {
+            'success': False,
+            'error-message': repr(e)
+        }
 
 
 @app.route('/telegram/chat-list')
@@ -56,10 +62,28 @@ def getTelegramChannelList():
 
 @app.route('/update-instruments', methods=['PATCH'])
 def updateInstrumentInfo():
-    return {
-        'success': True,
-        'error-message': None
-    }
+    try:
+        tradeService.updateInstrumentInfo(db, json.loads(request.data))
+        return {
+            'success': True,
+            'error-message': None
+        }
+    except Exception as e:
+        return {
+            'success': False,
+            'error-message': repr(e)
+        }
+
+
+@app.route('/instrument-list')
+def getAllInstruments():
+    try:
+        return tradeService.getAllInstruments(db)
+    except Exception as e:
+        return {
+            'success': False,
+            'error-message': repr(e)
+        }
 
 
 @bot.on_message(filters.channel)

@@ -82,6 +82,9 @@ def updateChatInfo(db, channelData):
     for i in range(0, len(channelData)):
         data = channelData[i]
         if 'id' in data:
+            if data['delete']:
+                deleteChatInfo(db, data)
+
             changeChatInfo(db, data)
             continue
 
@@ -105,12 +108,16 @@ def createChatInfo(db, data):
 
 def changeChatInfo(db, data):
     sql = "UPDATE selected_channels SET " \
-                                 f"chat_id=-100{data['chat_id']}, " \
-                                 f"chat_name='{data['chat_name']}', " \
-                                 f"allow_multiple_tp={data['allow_multiple_tp']}, " \
-                                 f"take_profit_key_words='{data['take_profit_key_words']}', " \
-                                 f"stop_loss_key_words='{data['stop_loss_key_words']}', " \
-                                 f"allow_market_watch={data['allow_market_watch']}, " \
-                                 f"selected_lost_size={data['selected_lot_size']} " \
-                                 f"WHERE id = {data['id']}"
+          f"chat_id=-100{data['chat_id']}, " \
+          f"chat_name='{data['chat_name']}', " \
+          f"allow_multiple_tp={data['allow_multiple_tp']}, " \
+          f"take_profit_key_words='{data['take_profit_key_words']}', " \
+          f"stop_loss_key_words='{data['stop_loss_key_words']}', " \
+          f"allow_market_watch={data['allow_market_watch']}, " \
+          f"selected_lost_size={data['selected_lot_size']} " \
+          f"WHERE id = {data['id']}"
     res = db['dbCursor'].execute(sql)
+
+
+def deleteChatInfo(db, data):
+    db['dbCursor'].execute(f"DELETE FROM selected_channels WHERE id = {data['id']}")

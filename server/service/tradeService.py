@@ -8,6 +8,50 @@ def sayHello():
     return trader.calculateTradeInputsForUSDPairs(0.66952)
 
 
+def getAllInstruments(db):
+    rows = db['dbCursor'].execute('SELECT * from allowed_instruments').fetchall()
+    result = []
+    for i in range(0, len(rows)):
+        result.append({
+            "id": rows[i][0],
+            "name": rows[i][1],
+            "value": rows[i][2]
+        })
+
+    return result
+
+
+def updateInstrumentInfo(db, instrumentData):
+    for i in range(0, len(instrumentData)):
+        data = instrumentData[i]
+        if 'id' in data:
+            if data['delete']:
+                deleteInstrument(db, data)
+
+            updateInstrument(db, data)
+            continue
+
+        createInstrument(db, data)
+
+    db['dbConnector'].commit()
+
+
+def createInstrument(db, data):
+    db['dbCursor'].execute("INSERT INTO allowed_instruments VALUES ("
+                           f"NULL, '{data['name']}', '{data['value']}'"
+                           ")")
+
+
+def updateInstrument(db, data):
+    db['dbCursor'].execute("UPDATE allowed_instruments SET "
+                           f"name='{data['name']}', value='{data['value']}' "
+                           f"WHERE id = {data['id']}")
+
+
+def deleteInstrument(db, data):
+    db['dbCursor'].execute(f"DELETE FROM allowed_instruments WHERE id = {data['id']}")
+
+
 def getActiveTrades():
     activeTrades = trader.getActiveTrades()
 
