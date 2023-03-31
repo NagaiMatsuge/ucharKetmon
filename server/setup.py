@@ -2,6 +2,7 @@ import threading
 from pyrogram import filters
 from flask import Flask, request
 from service import tradeService
+from service import telegramService
 import json
 from server.utils.init.initializer import initializeConfigs, initializeDb
 from server.utils.telegram.client import TelegramClient
@@ -39,15 +40,21 @@ def createTrade():
     return tradeService.createTrade(json.loads(request.data))
 
 
-@app.route('/update-chats', method=['PATCH'])
+@app.route('/update-chats', methods=['PATCH'])
 def updateChatInfo():
+    telegramService.updateChatInfo(db, json.loads(request.data))
     return {
         'success': True,
         'error-message': None
     }
 
 
-@app.route('/update-instruments', method=['PATCH'])
+@app.route('/telegram/chat-list')
+def getTelegramChannelList():
+    return telegramService.getAllChannels(bot)
+
+
+@app.route('/update-instruments', methods=['PATCH'])
 def updateInstrumentInfo():
     return {
         'success': True,
@@ -57,7 +64,12 @@ def updateInstrumentInfo():
 
 @bot.on_message(filters.channel)
 def newTradeSignal(client, message):
-    print(message.text)
+    telegramService.handleSignal(db, message.sender_chat.title, message.sender_chat.id, message.id, message.text)
+
+
+@bot.on_edited_message(filters.channel)
+def updateTrade(client, message):
+    print(message.id)
 
 
 threading.Thread(target=app.run, daemon=True).start()

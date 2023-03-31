@@ -90,11 +90,14 @@ class Analyzer:
         if self.stop_loss is None or len(self.take_profit_levels) == 0:
             return False
 
+        return True
+
     def identifyAllTakeProfitLevels(self):
         if self.serialized_chat_info['allow_multiple_tp']:
             for i in range(0, len(self.serialized_chat_info['take_profit_key_words']) - 1):
                 current_key_word = self.serialized_chat_info['take_profit_key_words'][i]
                 self.take_profit_levels.append(self.identifySingleTakeProfitLevel(current_key_word))
+                self.take_profit_levels = [i for i in self.take_profit_levels if i is not None]
         else:
             self.take_profit_levels.append(
                 self.identifySingleTakeProfitLevel(self.serialized_chat_info['take_profit_key_words'][0])
@@ -102,11 +105,11 @@ class Analyzer:
 
     def identifyStopLossLevel(self):
         index_start = self.text.find(self.serialized_chat_info['stop_loss_key_word'])
-        index_end = index_start + len(self.serialized_chat_info['top_loss_key_word'])
+        index_end = index_start + len(self.serialized_chat_info['stop_loss_key_word'])
         skipped_first_space = False
         for i in range(index_end, len(self.text)):
             current_char = self.text[i]
-            if current_char.isnumeric():
+            if current_char.isnumeric() or current_char == ".":
                 if self.stop_loss is None:
                     self.stop_loss = str(current_char)
                     continue
@@ -131,7 +134,7 @@ class Analyzer:
         skipped_first_space = False
         for i in range(index_end, len(self.text)):
             current_char = self.text[i]
-            if current_char.isnumeric():
+            if current_char.isnumeric() or current_char == ".":
                 if take_profit_level is None:
                     take_profit_level = str(current_char)
                     continue
@@ -146,3 +149,9 @@ class Analyzer:
                     break
 
         return take_profit_level
+
+    def printDetails(self):
+        print("Signal Info:")
+        print(f"Instrument: {self.action} {self.symbol}")
+        print(f"Take-profit-levels: {self.take_profit_levels}")
+        print(f"Stop-loss: {self.stop_loss}")

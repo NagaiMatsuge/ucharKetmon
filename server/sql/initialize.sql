@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS selected_channels (
 
 CREATE TABLE IF NOT EXISTS trades (
             id INTEGER PRIMARY KEY,
+            message_id INTEGER NOT NULL,
             tg_chat_id INTEGER NOT NULL,
             tg_chat_name TEXT DEFAULT NULL,
             mt_trade_id INTEGER DEFAULT NULL,
