@@ -5,9 +5,10 @@ import AnimatedNumber from "animated-number-react2";
 function History() {
 
     const [closedTrades, setClosedTrades] = useState([]);
+    const [totalProfit, setTotalProfit] = useState(0);
     useEffect(() => {
         fetchActiveTrades();
-        const interval = setInterval(() => fetchActiveTrades(), 3000)
+        const interval = setInterval(() => fetchActiveTrades(), 5000)
         return () => {
             clearInterval(interval);
         }
@@ -18,11 +19,24 @@ function History() {
             .get('http://localhost:5000/closed-trades')
             .then((res) => {
                 setClosedTrades(res.data);
+                let sum = 0
+                res.data.forEach(trade => {
+                    sum += trade['profit']
+                })
+                setTotalProfit(sum)
             })
             .catch((err) => {
                 console.log(err);
             });
     };
+
+    const identifyColor = (number) => {
+        if (number >= 0) {
+            return "text-success"
+        }
+
+        return "text-danger"
+    }
 
     return (
         <div className="container border rounded mt-4">
@@ -55,18 +69,18 @@ function History() {
             <table className="table">
                 <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
+                    <th scope="col">Trades</th>
+                    <th scope="col">Instrument</th>
+                    <th scope="col" className={identifyColor(totalProfit)}>Profit: {formatValue(totalProfit)}</th>
+                    <th scope="col">From</th>
                 </tr>
                 </thead>
                 <tbody>
-                {closedTrades.map((trade) => (
+                {closedTrades.reverse().map((trade) => (
                     <tr className="w-25">
                         <th scope="row">{trade['ticket']}</th>
                         <td>{trade['instrument']}</td>
-                        <td>{trade['profit']}</td>
+                        <td className={trade['profit'] > 0 ? "text-success" : "text-danger"}>{trade['profit']}</td>
                         <td>{trade['comment'] ? trade['comment'] : 'Not from Signal Channel'}</td>
                     </tr>
                 ))}

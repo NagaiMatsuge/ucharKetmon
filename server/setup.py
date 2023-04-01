@@ -69,6 +69,11 @@ def getTelegramChannelList():
     return telegramService.getAllChannels(bot)
 
 
+@app.route('/chat-list')
+def getAllowedChatList():
+    return tradeService.getAllowedChats(db)
+
+
 @app.route('/update-instruments', methods=['PATCH'])
 def updateInstrumentInfo():
     try:

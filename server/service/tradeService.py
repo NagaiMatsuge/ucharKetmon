@@ -8,6 +8,27 @@ def sayHello():
     return trader.calculateTradeInputsForUSDPairs(0.66952)
 
 
+def getAllowedChats(db):
+    dbCursor = db['dbConnector'].cursor()
+    rows = dbCursor.execute('SELECT * FROM selected_channels').fetchall()
+
+    response = []
+    for i in range(0, len(rows)):
+        data = rows[i]
+        response.append({
+            'id': data[0],
+            'chat_id': data[1],
+            'chat_name': data[2],
+            'allow_multiple_tp': data[3],
+            'take_profit_key_words': data[4],
+            'stop_loss_key_words': data[5],
+            'allow_market_watch': data[6],
+            'selected_lost_size': data[7]
+        })
+
+    return response
+
+
 def getAllInstruments(db):
     rows = db['dbCursor'].execute('SELECT * from allowed_instruments').fetchall()
     result = []
@@ -57,7 +78,7 @@ def getActiveTrades():
 
     response = []
     for i in (range(0, len(activeTrades.values))):
-        response.append(constructTradeInfo(activeTrades.values[i]))
+        response.append(constructTradeInfo(activeTrades.values[i], True))
 
     return response
 
@@ -67,7 +88,7 @@ def getClosedTrades():
 
     response = []
     for i in (range(0, len(closedTrades.values))):
-        response.append(constructTradeInfo(closedTrades.values[i]))
+        response.append(constructTradeInfo(closedTrades.values[i], False))
 
     return response
 
@@ -80,8 +101,8 @@ def createTrade(data):
     return trader.placeOrder(data)
 
 
-def constructTradeInfo(values):
-    return {
+def constructTradeInfo(values, active):
+    value = {
         'ticket': values[0],
         'instrument': values[1],
         'order_ticket': values[2],
@@ -91,9 +112,24 @@ def constructTradeInfo(values):
         'open_price': values[6],
         'open_time': datetime.datetime.fromtimestamp(values[7]),
         'stop_loss': values[8],
-        'take_profit': values[9],
-        'comment': values[10],
-        'profit': values[11],
-        'swap': values[12],
-        'commission': values[13]
+        'take_profit': values[9]
     }
+
+    if not active:
+        value2 = {
+            'close_price': values[10],
+            'close_time': values[11],
+            'comment': values[12],
+            'profit': values[13],
+            'swap': values[14],
+            'commission': values[15]
+        }
+    else:
+        value2 = {
+            'comment': values[10],
+            'profit': values[11],
+            'swap': values[12],
+            'commission': values[13]
+        }
+
+    return {**value, **value2}

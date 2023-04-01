@@ -1,6 +1,8 @@
 import History from "./components/History"
 import ActiveTrades from "./components/ActiveTrades";
 import Info from "./components/Info";
+import UpdateInstruments from "./components/UpdateInstruments";
+import UpdateChannels from "./components/UpdateChannels";
 
 function App() {
     return (
@@ -23,8 +25,8 @@ function App() {
                                         Dropdown
                                     </a>
                                     <ul className="dropdown-menu">
-                                        <li><a className="dropdown-item" href="#">Action</a></li>
-                                        <li><a className="dropdown-item" href="#">Another action</a></li>
+                                        <li><button className="dropdown-item" data-bs-toggle="modal" data-bs-target="#updateInstrumentsModal">Update Instruments</button></li>
+                                        <li><button className="dropdown-item" data-bs-toggle="modal" data-bs-target="#updateChannelsModal">Select Channels</button></li>
                                         <li>
                                             <hr className="dropdown-divider"></hr>
                                         </li>
@@ -52,6 +54,8 @@ function App() {
                     </div>
                 </nav>
             </div>
+            <UpdateInstruments />
+            <UpdateChannels />
             <Info />
             <ActiveTrades />
             <History/>

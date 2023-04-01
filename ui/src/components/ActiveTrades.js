@@ -7,7 +7,7 @@ const ActiveTrades = () => {
     const [totalProfit, setTotalProfit] = useState(0)
     useEffect(() => {
         fetchActiveTrades();
-        const interval = setInterval(() => fetchActiveTrades(), 1000)
+        const interval = setInterval(() => fetchActiveTrades(), 2000)
         return () => {
             clearInterval(interval);
         }
