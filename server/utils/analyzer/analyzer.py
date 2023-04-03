@@ -44,11 +44,11 @@ class Analyzer:
         return False
 
     def checkForConfigFiles(self):
-        if not os.path.isfile('./server/config.json'):
-            with open('./server/config.json', 'w') as config_file:
+        if not os.path.isfile('./config.json'):
+            with open('./config.json', 'w') as config_file:
                 json.dump(self.config, config_file)
         else:
-            with open('./server/config.json', 'r') as config_file:
+            with open('./config.json', 'r') as config_file:
                 self.config = json.load(config_file)
 
     def identifyAction(self):

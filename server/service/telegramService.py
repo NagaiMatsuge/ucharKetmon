@@ -21,7 +21,6 @@ def handleSignal(db, chat_name, chat_id, message_id, text):
         'allow_market_watch': allowed_chat[6],
         'selected_lot_size': allowed_chat[7]
     }
-    print('Take profit key wordssss:', serialized_chat_info['take_profit_key_words'])
     analyzer = Analyzer(text, db['dbCursor'], chat_id, chat_name, serialized_chat_info)
     if not analyzer.isSignalValid():
         print('Signal Is not valid')
@@ -68,7 +67,6 @@ def getChannelById(dbCursor, chat_id):
 def getAllChannels(bot):
     channels = bot.invoke(raw.functions.messages.GetAllChats(except_ids=[]))
     response = []
-    print(channels)
     for i in range(0, len(channels.chats) - 1):
         response.append({
             'chat_id': channels.chats[i].id,

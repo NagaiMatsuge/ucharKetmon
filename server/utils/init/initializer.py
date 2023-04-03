@@ -5,8 +5,8 @@ from server.utils.analyzer.analyzer import Analyzer
 
 
 def initializeConfigs():
-    if not os.path.isfile('./server/config.json'):
-        with open('./server/config.json', 'w') as config_file:
+    if not os.path.isfile('./config.json'):
+        with open('./config.json', 'w') as config_file:
             json.dump(Analyzer.config, config_file)
 
 

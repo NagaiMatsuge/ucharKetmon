@@ -4,7 +4,7 @@ import json
 
 class TelegramClient:
     def __init__(self):
-        with open('./server/config.json', 'r') as f:
+        with open('./config.json', 'r') as f:
             self.config = json.load(f)
 
         self.username = self.config['telegram_user_name']
