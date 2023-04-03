@@ -21,7 +21,7 @@ def handleSignal(db, chat_name, chat_id, message_id, text):
         'allow_market_watch': allowed_chat[6],
         'selected_lot_size': allowed_chat[7]
     }
-
+    print('Take profit key wordssss:', serialized_chat_info['take_profit_key_words'])
     analyzer = Analyzer(text, db['dbCursor'], chat_id, chat_name, serialized_chat_info)
     if not analyzer.isSignalValid():
         print('Signal Is not valid')

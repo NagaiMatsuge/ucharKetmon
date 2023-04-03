@@ -35,8 +35,8 @@ function App() {
                                 </li>
                             </ul>
                             <form className="d-flex" role="search">
-                                <select className="form-select me-2" aria-label="Default select example">
-                                    <option selected>Select instrument</option>
+                                <select value={0} className="form-select me-2" aria-label="Default select example">
+                                    <option value="0">Select instrument</option>
                                     <option value="1">GBPJPY</option>
                                     <option value="2">NASDAQ</option>
                                     <option value="3">GOLD</option>

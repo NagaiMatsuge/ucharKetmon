@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import axios from "axios";
-import AnimatedNumber from "animated-number-react2";
 
 function History() {
 
@@ -76,8 +75,8 @@ function History() {
                 </tr>
                 </thead>
                 <tbody>
-                {closedTrades.reverse().map((trade) => (
-                    <tr className="w-25">
+                {closedTrades.reverse().map((trade, index) => (
+                    <tr key={index} className="w-25">
                         <th scope="row">{trade['ticket']}</th>
                         <td>{trade['instrument']}</td>
                         <td className={trade['profit'] > 0 ? "text-success" : "text-danger"}>{trade['profit']}</td>

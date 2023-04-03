@@ -5,13 +5,18 @@ import axios from "axios";
 const UpdateChannels = () => {
 
     const [channels, setChannels] = useState([])
+    const [telegramChats, setTelegramChats] = useState([])
+    const [chatId, setChatId] = useState(11);
+    const [takeProfitKeyWords, setTakeProfitKeyWords] = useState('');
+    const [stopLossKeyWords, setStopLossKeyWords] = useState('');
+    const [selectedLotSize, setSelectedLotSize] = useState('');
+    const [allowMultipleTp, setAllowMultipleTp] = useState(false);
+    const [allowMarketWatch, setAllowMarketWatch] = useState(false);
+    const [chatName, setChatName] = useState('');
 
     useEffect(() => {
         fetchChannels();
-        const interval = setInterval(() => fetchChannels(), 2000)
-        return () => {
-            clearInterval(interval);
-        }
+        fetchAllTelegramChats();
     }, []);
 
     const fetchChannels = () => {
@@ -25,6 +30,50 @@ const UpdateChannels = () => {
             });
     };
 
+    const fetchAllTelegramChats = () => {
+        axios
+            .get('http://localhost:5000/telegram/chat-list')
+            .then((res) => {
+                setTelegramChats(res.data)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+
+    const chatSelected = (event) => {
+        let chat_name = null
+        for (const chat of telegramChats) {
+            if (String(chat['chat_id']) === event.target.value) {
+                chat_name = chat['chat_name']
+                break;
+            }
+        }
+
+        if (chat_name) {
+            setChatId(event.target.value)
+            setChatName(chat_name)
+            console.log("Chat has been selected")
+        }
+    }
+
+    const saveChat = (event) => {
+        event.preventDefault();
+        const requestBody = {
+            chat_id: Number(chatId),
+            take_profit_key_words: takeProfitKeyWords,
+            stop_loss_key_words: stopLossKeyWords,
+            selected_lot_size: Number(selectedLotSize),
+            allow_multiple_tp: allowMultipleTp,
+            allow_market_watch: allowMarketWatch,
+            chat_name: chatName,
+            delete: false
+        };
+        axios.patch('http://localhost:5000/update-chats', [requestBody]).then(res => console.log(res))
+            .catch(err => console.log(err))
+        console.log(requestBody)
+    }
+
     return (
         <div className="modal fade modal-xl" id="updateChannelsModal" aria-labelledby="updateChannelsModal"
              aria-hidden="true">
@@ -35,33 +84,48 @@ const UpdateChannels = () => {
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div className="modal-body">
-                        <form className="row g-2">
+                        <form className="row g-2" onSubmit={saveChat}>
                             <div className="col-auto">
-                                <input type="text" className="form-control" disabled id="lot"
-                                       placeholder="Channel"></input>
+                                <select value={chatId} className="form-select" aria-label="Default select example"
+                                        onChange={chatSelected}>
+                                    <option value={11}>Select Telegram Channel</option>
+                                    {telegramChats.map(chat => (
+                                        <option value={chat['chat_id']}>{chat['chat_name']}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-auto">
-                                <input type="text" className="form-control" id="take_profit_key_words"
+                                <input type="text" name="take_profit_key_words" className="form-control"
+                                       id="take_profit_key_words" value={takeProfitKeyWords}
+                                       onChange={event => setTakeProfitKeyWords(event.target.value)}
                                        placeholder="Take Profit Key Words"></input>
                             </div>
                             <div className="col-auto">
-                                <input type="text" className="form-control" id="stop_loss_key_words"
+                                <input type="text" name="stop_loss_key_words" className="form-control"
+                                       id="stop_loss_key_words" value={stopLossKeyWords}
+                                       onChange={event => setStopLossKeyWords(event.target.value)}
                                        placeholder="Stop Loss Key Words"></input>
                             </div>
                             <div className="col-auto">
-                                <input type="text" className="form-control" id="lot"
+                                <input type="number" name="selected_lot_size" value={selectedLotSize}
+                                       className="form-control" id="lot"
+                                       onChange={event => setSelectedLotSize(event.target.value)}
                                        placeholder="Lot"></input>
                             </div>
                             <div className="col-auto">
                                 <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" value="" id="MultipleTP">
+                                    <input className="form-check-input" name="allow_multiple_tp" type="checkbox"
+                                           id="MultipleTP" onChange={event => setAllowMultipleTp(event.target.checked)}
+                                           checked={allowMultipleTp}>
                                     </input>
                                     <label className="form-check-label" htmlFor="MultipleTP">
                                         Multiple TP
                                     </label>
                                 </div>
                                 <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" value="" id="MarketWatch">
+                                    <input className="form-check-input" name="allow_market_watch" type="checkbox"
+                                           onChange={event => setAllowMarketWatch(event.target.checked)}
+                                           checked={allowMarketWatch} id="MarketWatch">
                                     </input>
                                     <label className="form-check-label" htmlFor="MarketWatch">
                                         Market Watch
@@ -69,7 +133,7 @@ const UpdateChannels = () => {
                                 </div>
                             </div>
                             <div className="col-auto d-flex justify-content-end">
-                                <button type="button" className="btn btn-primary">Save</button>
+                                <button type="submit" className="btn btn-primary" onClick={saveChat}>Save</button>
                             </div>
                         </form>
                         <table className="table">
@@ -86,8 +150,18 @@ const UpdateChannels = () => {
                             </tr>
                             </thead>
                             <tbody>
+                            <tr>
+                                <td>0</td>
+                                <td>Example Chat Name</td>
+                                <td>Yes</td>
+                                <td>No</td>
+                                <td>take-profit1:,take-profit2:,take-profit3,take-profit4</td>
+                                <td>stop-loss:</td>
+                                <td>0.01</td>
+                                <td></td>
+                            </tr>
                             {channels.map((channel, index) => (
-                                <tr>
+                                <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{channel['chat_name']}</td>
                                     <td>{channel['allow_multiple_tp'] ? 'Yes' : 'No'}</td>

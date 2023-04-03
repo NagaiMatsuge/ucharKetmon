@@ -45,8 +45,8 @@ const ActiveTrades = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {activeTrades.map((trade) => (
-                    <tr className="w-25">
+                {activeTrades.map((trade, index) => (
+                    <tr key={index} className="w-25">
                         <th scope="row">{trade['ticket']}</th>
                         <td>{trade['instrument']}</td>
                         <td><AnimatedNumber

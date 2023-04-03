@@ -5,13 +5,11 @@ import axios from "axios";
 const UpdateInstruments = () => {
 
     const [instruments, setInstruments] = useState([])
+    const [name, setName] = useState('');
+    const [value, setValue] = useState('');
 
     useEffect(() => {
         fetchInstruments();
-        const interval = setInterval(() => fetchInstruments(), 2000)
-        return () => {
-            clearInterval(interval);
-        }
     }, []);
 
     const fetchInstruments = () => {
@@ -25,6 +23,17 @@ const UpdateInstruments = () => {
             });
     };
 
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const requestBody = {
+            name: name,
+            value: value
+        };
+        axios.patch('http://localhost:5000/update-instruments', [requestBody])
+            .then(res => console.log(res))
+            .catch(err => console.log(err))
+    }
+
     return (
         <div className="modal fade modal-xl" id="updateInstrumentsModal" aria-labelledby="exampleModalLabel"
              aria-hidden="true">
@@ -35,13 +44,15 @@ const UpdateInstruments = () => {
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div className="modal-body">
-                        <form className="row g-3">
+                        <form className="row g-3" onSubmit={handleSubmit}>
                             <div className="col-auto">
                                 <input type="text" className="form-control" id="instrumentName"
+                                       value={name} onChange={event => setName(event.target.value)}
                                        placeholder="Name"></input>
                             </div>
                             <div className="col-auto">
                                 <input type="text" className="form-control" id="instrumentValue"
+                                       value={value} onChange={event => setValue(event.target.value)}
                                        placeholder="Value"></input>
                             </div>
                             <div className="col-auto">
@@ -59,7 +70,7 @@ const UpdateInstruments = () => {
                             </thead>
                             <tbody>
                             {instruments.map((instrument, index) => (
-                                <tr className="w-25">
+                                <tr key={index} className="w-25">
                                     <td>{index + 1}</td>
                                     <td>{instrument['name']}</td>
                                     <td>{instrument['value']}</td>

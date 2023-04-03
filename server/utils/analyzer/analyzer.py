@@ -104,7 +104,7 @@ class Analyzer:
             )
 
     def identifyStopLossLevel(self):
-        index_start = self.text.find(self.serialized_chat_info['stop_loss_key_word'])
+        index_start = self.text.find(self.serialized_chat_info['stop_loss_key_word'].lower())
         index_end = index_start + len(self.serialized_chat_info['stop_loss_key_word'])
         skipped_first_space = False
         for i in range(index_end, len(self.text)):
@@ -124,7 +124,7 @@ class Analyzer:
                     break
 
     def identifySingleTakeProfitLevel(self, take_profit_key_word):
-        if take_profit_key_word not in self.text:
+        if take_profit_key_word.lower() not in self.text:
             return
 
         take_profit_level = None
