@@ -30,7 +30,12 @@ const UpdateInstruments = () => {
             value: value
         };
         axios.patch('http://localhost:5000/update-instruments', [requestBody])
-            .then(res => console.log(res))
+            .then(res => {
+                console.log(res);
+                fetchInstruments();
+                setName('')
+                setValue('')
+            })
             .catch(err => console.log(err))
     }
 

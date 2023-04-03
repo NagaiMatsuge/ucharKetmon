@@ -1,16 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import axios from "axios";
+import ClosedTrade from "./ClosedTrade";
 
 function History() {
 
     const [closedTrades, setClosedTrades] = useState([]);
     const [totalProfit, setTotalProfit] = useState(0);
+    const [searchChannel, setSearchChannel] = useState('')
+    const [filteredTrades, setFilteredTrades] = useState([])
     useEffect(() => {
         fetchActiveTrades();
-        const interval = setInterval(() => fetchActiveTrades(), 5000)
-        return () => {
-            clearInterval(interval);
-        }
     }, []);
     const formatValue = (value) => value.toFixed(2);
     const fetchActiveTrades = () => {
@@ -18,16 +17,30 @@ function History() {
             .get('http://localhost:5000/closed-trades')
             .then((res) => {
                 setClosedTrades(res.data);
-                let sum = 0
-                res.data.forEach(trade => {
-                    sum += trade['profit']
-                })
-                setTotalProfit(sum)
+                setFilteredTrades(res.data)
+                calculateTotalProfit(res.data)
+                return res.data
             })
             .catch((err) => {
                 console.log(err);
             });
     };
+
+    const filterTrades = (event) => {
+        event.preventDefault()
+        let filtered = closedTrades.filter(trade => trade['comment'].search(searchChannel) >= 0)
+        setFilteredTrades(filtered)
+        calculateTotalProfit(filtered)
+    }
+
+    const calculateTotalProfit = (trades) => {
+        let sum = 0
+        trades.forEach(trade => {
+            sum += trade['profit']
+        })
+
+        setTotalProfit(sum)
+    }
 
     const identifyColor = (number) => {
         if (number >= 0) {
@@ -52,7 +65,8 @@ function History() {
                     <div className="collapse navbar-collapse w-50" id="navbarSupportedContent">
                         <form className="d-flex w-100" role="search">
                             <input className="form-control me-2" type="search" placeholder="Channel"
-                                   aria-label="Channel"></input>
+                                   aria-label="Channel" value={searchChannel}
+                                   onChange={event => setSearchChannel(event.target.value)}></input>
                             <select className="form-select me-2" aria-label="Default select example">
                                 <option value="1" selected>This month</option>
                                 <option value="2">Last 2 months</option>
@@ -60,7 +74,9 @@ function History() {
                                 <option value="4">Last year</option>
                                 <option value="5">All time</option>
                             </select>
-                            <button className="btn btn-primary text-nowrap" type="submit">Apply Filter</button>
+                            <button onClick={filterTrades} className="btn btn-primary text-nowrap">Apply
+                                Filter
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -75,13 +91,8 @@ function History() {
                 </tr>
                 </thead>
                 <tbody>
-                {closedTrades.reverse().map((trade, index) => (
-                    <tr key={index} className="w-25">
-                        <th scope="row">{trade['ticket']}</th>
-                        <td>{trade['instrument']}</td>
-                        <td className={trade['profit'] > 0 ? "text-success" : "text-danger"}>{trade['profit']}</td>
-                        <td>{trade['comment'] ? trade['comment'] : 'Not from Signal Channel'}</td>
-                    </tr>
+                {filteredTrades.map((trade, index) => (
+                    <ClosedTrade index={index} trade={trade}/>
                 ))}
                 </tbody>
             </table>

@@ -69,7 +69,10 @@ const UpdateChannels = () => {
             chat_name: chatName,
             delete: false
         };
-        axios.patch('http://localhost:5000/update-chats', [requestBody]).then(res => console.log(res))
+        axios.patch('http://localhost:5000/update-chats', [requestBody]).then(res => {
+            console.log(res)
+            fetchChannels();
+        })
             .catch(err => console.log(err))
         console.log(requestBody)
     }

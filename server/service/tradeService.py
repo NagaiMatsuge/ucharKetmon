@@ -90,7 +90,7 @@ def getClosedTrades():
     for i in (range(0, len(closedTrades.values))):
         response.append(constructTradeInfo(closedTrades.values[i], False))
 
-    return response
+    return response[::-1]
 
 
 def getAccountInfo():
